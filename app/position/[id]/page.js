@@ -1,5 +1,5 @@
 async function getData(id) {
-  const response = await fetch(`http://127.0.0.1:8000/api/v1/position/${id}/?settlement_currency=USD`, {
+  const response = await fetch(`${process.env.API_BASE_URL}/api/v1/position/${id}/?settlement_currency=USD`, {
     next : {
       revalidate: 20
     }

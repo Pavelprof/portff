@@ -1,5 +1,9 @@
 'use client';
 
+import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+
 export default function ErrorWrapper(errorData) {
     let detailMessage;
 
@@ -8,9 +12,17 @@ export default function ErrorWrapper(errorData) {
         const errorMessageObject = JSON.parse(errorMessageString);
         detailMessage = errorMessageObject.detail;
     } catch (e) {
-        // JSON.parse вызвал ошибку, вернем errorMessageString вместо этого
         detailMessage = errorData.error.message;
     }
 
-    return <h1>{detailMessage}</h1>
+    useEffect(() => {
+        console.log('Test')
+    })
+
+    return (
+    <div>
+        <h1>{detailMessage}</h1>
+        <p><Link href= "/">Перейти на главную страницу</Link></p>
+    </div>
+    )
 }

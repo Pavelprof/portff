@@ -4,17 +4,13 @@ import PropTypes from 'prop-types';
 
 export const metadata = {
     title: 'FINANCE ACTIVITY',
-    description: 'List of your deals and transactions',
+    description: 'List of your transactions',
 }
 
 export default function FinanceLayout({ children }) {
     return (
         <div>
             <h1>Your finance activity</h1>
-            <ul>
-                <li><Link href="/finance/deal/1">Deal</Link></li>
-                <li><Link href="/finance/transaction/1">Transaction</Link></li>
-            </ul>
             {children}
         </div>
     );
@@ -23,21 +19,3 @@ export default function FinanceLayout({ children }) {
 FinanceLayout.propTypes = {
     children: PropTypes.node,
 };
-
-
-
-
-// export default function FinanceLayout({
-//     children,
-// }: {
-//     children: React.ReactNode;
-// }) {
-//     return <div>
-//         <h1>Your finance activity</h1>
-//         <ul>
-//             <li><Link href="finance/deal">Deal</Link></li>
-//             <li><Link href="finance/transaction">Transaction</Link></li>
-//         </ul>
-//         {children}
-//     </div>
-// }

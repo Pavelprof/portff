@@ -1,16 +1,8 @@
 import Link from 'next/link';
-
-async function getData() {
-  const response = await fetch('http://127.0.0.1:8000/api/v1/position/?settlement_currency=USD');
-  if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(JSON.stringify(errorData));
-  }
-  return response.json();
-}
+import { getPositions } from '@/services/services';
 
 export default async function PositionList() {
-  const positions = await getData()
+  const positions = await getPositions()
 
   return (
   <>
