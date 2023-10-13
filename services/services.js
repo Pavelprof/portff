@@ -4,7 +4,7 @@ export const fetchTransactions = async ({
   account = [],
   type_transaction = [],
 }) => {
-  const baseUrl = `${process.env.API_BASE_URL}api/v1/transaction/?`;
+  const baseUrl = `${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/transaction/?`;
   const params = new URLSearchParams();
 
   if (time_transaction_after) params.append('time_transaction_after', time_transaction_after);
@@ -24,7 +24,7 @@ export const fetchTransactions = async ({
 
 
 export async function getPositions() {
-  const response = await fetch(`${process.env.API_BASE_URL}api/v1/position/?settlement_currency=USD`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/position/?settlement_currency=USD`);
   if (!response.ok) {
       const errorData = await response.json();
       throw new Error(JSON.stringify(errorData));

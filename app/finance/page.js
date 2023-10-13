@@ -2,17 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 
-export async function fetchTransactions() {
-  const resp = await fetch(`${process.env.API_BASE_URL}api/v1/transaction/?`, { cache: 'no-store' });
-  return resp.json();
-};
+export default function Transactions() {
+  const [transactions, setTransactions] = useState([]);
 
-export default async function Transactions() {
-  const transactions = await fetchTransactions();
+  async function fetchTransactions() {
+    const resp = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/transaction/?`, { cache: 'no-store' });
+    const data = await resp.json();
+    console.log(data)
+    return data;
+  };
+
+  useEffect(() => {
+    async function getTransactions() {
+      const fetchedTransactions = await fetchTransactions();
+      setTransactions(fetchedTransactions);
+    }
+
+    getTransactions();
+  }, []);
 
   return (
-      <ul>
-      {transactions.map(transaction => (
+    <ul>
+      { transactions.map(transaction => (
         <li key={transaction.id}>
           <h3>{transaction.time_transaction}</h3>
         </li>
