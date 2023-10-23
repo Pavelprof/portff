@@ -31,3 +31,11 @@ export async function getPositions() {
   }
   return response.json();
 }
+
+export const fetchTransactionTypes = async () => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/transaction/unique_transaction_types/`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};

@@ -29,7 +29,9 @@ const Navigation = ({ userName }) => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             {userName}
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Link href="/" passHref>
+            <Button color="inherit">Login</Button>
+          </Link>
         </Toolbar>
       </AppBar>
       <Drawer
