@@ -1,3 +1,6 @@
+import { options } from "@/app/api/auth/[...nextauth]/options";
+import { getServerSession } from "next-auth";
+
 export const fetchTransactions = async ({
   time_transaction_after = "",
   time_transaction_before = "",
@@ -24,7 +27,12 @@ export const fetchTransactions = async ({
 
 
 export async function getPositions() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/position/?settlement_currency=USD`);
+  const session = await getServerSession(options)
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/position/?settlement_currency=USD`, {
+    headers: {
+      'Authorization': `Bearer ${session.accessToken}`
+    }
+  });
   if (!response.ok) {
       const errorData = await response.json();
       throw new Error(JSON.stringify(errorData));

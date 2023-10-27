@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { AppBar, Toolbar, IconButton, Typography, Button, Drawer, List, ListItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box } from '@mui/system';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
-const Navigation = ({ userName }) => {
+const Navigation = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { data: session } = useSession();
+  // console.log(session);
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
@@ -26,12 +29,16 @@ const Navigation = ({ userName }) => {
           >
             <MenuIcon />
           </IconButton>
+  
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {userName}
+            {session && session.user.name}
           </Typography>
-          <Link href="/" passHref>
-            <Button color="inherit">Login</Button>
-          </Link>
+  
+          {session ? (
+            <Button color="inherit" onClick={() => signOut()}>Logout</Button>
+          ) : (
+            <Button color="inherit" onClick={() => signIn()}>Login</Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
