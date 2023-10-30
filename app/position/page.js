@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { getPositions } from '@/services/services';
+import { getServerSession } from 'next-auth';
+import { options } from "@/app/api/auth/[...nextauth]/options";
 
 export default async function PositionList() {
-  const positions = await getPositions()
+  const session = await getServerSession(options);
+  const positions = await getPositions(session)
 
   return (
   <>
