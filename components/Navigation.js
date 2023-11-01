@@ -10,7 +10,6 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 const Navigation = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { data: session } = useSession();
-  console.log(session)
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);

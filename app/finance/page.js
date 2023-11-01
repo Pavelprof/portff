@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -20,6 +21,7 @@ export default function Transactions() {
   });
   const [transactions, setTransactions] = useState([]);
   const [transactionTypes, setTransactionTypes] = useState([]);
+  const { data: session } = useSession();
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -44,7 +46,7 @@ export default function Transactions() {
   useEffect(() => {
     async function getTransactionTypes() {
       try {
-        const types = await fetchTransactionTypes();
+        const types = await fetchTransactionTypes(session);
         setTransactionTypes(Object.entries(types));
       } catch (error) {
         console.error('There was an error fetching the transaction types: ', error);

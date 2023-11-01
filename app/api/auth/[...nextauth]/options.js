@@ -58,7 +58,7 @@ export const options = {
       }
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token, user }) {      
       if (token) {
         if (token.expiresAt && new Date(token.expiresAt) < new Date()) {
           const res = await fetch(
