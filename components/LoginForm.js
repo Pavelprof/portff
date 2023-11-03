@@ -21,7 +21,7 @@ const LoginForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/token/`, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_PORTF_URL}/api/v1/token/`, {
         username,
         password,
       });

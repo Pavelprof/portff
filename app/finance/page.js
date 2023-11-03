@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Chip from '@mui/material/Chip';
-import { fetchTransactions, fetchTransactionTypes } from '@/services/services';
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Chip from "@mui/material/Chip";
+import { fetchTransactions, fetchTransactionTypes } from "@/services/services";
+import { useApi } from "@/app/api/api";
 
 export default function Transactions() {
   const [filters, setFilters] = useState({
@@ -22,10 +23,11 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [transactionTypes, setTransactionTypes] = useState([]);
   const { data: session } = useSession();
+  const api = useApi();
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
-    setFilters(prevFilters => ({
+    setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
@@ -36,22 +38,25 @@ export default function Transactions() {
       const fetchedTransactions = await fetchTransactions(filters);
       setTransactions(fetchedTransactions);
     } catch (error) {
-      console.error('There was an error fetching the transactions: ', error);
+      console.error("There was an error fetching the transactions: ", error);
     }
   };
 
-  const accounts = ['1', '2', '3','4', '5', '6'];
-  // const transactionTypes = ['1', '2', '3','4','5','6','7'];
+  const accounts = ["1", "2", "3", "4", "5", "6"];
 
   useEffect(() => {
-    async function getTransactionTypes() {
+    const getTransactionTypes = async () => {
       try {
-        const types = await fetchTransactionTypes(session);
-        setTransactionTypes(Object.entries(types));
+        const types = await api.get(
+          "/api/v1/transaction/unique_transaction_types/"
+        );
+        console.log(types);
+        console.log(types.data);
+        setTransactionTypes(Object.entries(types.data));
       } catch (error) {
-        console.error('There was an error fetching the transaction types: ', error);
+        console.error(error);
       }
-    }
+    };
 
     getTransactionTypes();
   }, []);
@@ -61,10 +66,10 @@ export default function Transactions() {
       <Box
         component="form"
         sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'start',
+          "& .MuiTextField-root": { m: 1, width: "25ch" },
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
         }}
         noValidate
         autoComplete="off"
@@ -89,7 +94,7 @@ export default function Transactions() {
           }}
           onChange={handleFilterChange}
         />
-        <FormControl sx={{ m: 1, width: '25ch' }}>
+        <FormControl sx={{ m: 1, width: "25ch" }}>
           <InputLabel id="account-label">Account</InputLabel>
           <Select
             labelId="account-label"
@@ -98,7 +103,7 @@ export default function Transactions() {
             name="account"
             onChange={handleFilterChange}
             renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
                   <Chip key={value} label={value} />
                 ))}
@@ -112,7 +117,7 @@ export default function Transactions() {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ m: 1, width: '25ch' }}>
+        <FormControl sx={{ m: 1, width: "25ch" }}>
           <InputLabel id="type-transaction-label">Transaction Type</InputLabel>
           <Select
             labelId="type-transaction-label"
@@ -121,9 +126,15 @@ export default function Transactions() {
             name="type_transaction"
             onChange={handleFilterChange}
             renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
-                  <Chip key={value} label={transactionTypes.find(type => type[1] === value)?.[0] || value} />
+                  <Chip
+                    key={value}
+                    label={
+                      transactionTypes.find((type) => type[1] === value)?.[0] ||
+                      value
+                    }
+                  />
                 ))}
               </Box>
             )}

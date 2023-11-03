@@ -19,7 +19,7 @@ export const options = {
       },
       async authorize(credentials) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/token/`,
+          `${process.env.NEXT_PUBLIC_API_PORTF_URL}/api/v1/token/`,
           {
             method: "POST",
             body: JSON.stringify(credentials),
@@ -62,7 +62,7 @@ export const options = {
       if (token) {
         if (token.expiresAt && new Date(token.expiresAt) < new Date()) {
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_PORTF_URL}api/v1/token/refresh/`,
+            `${process.env.NEXT_PUBLIC_API_PORTF_URL}/api/v1/token/refresh/`,
             {
               method: "POST",
               body: JSON.stringify({ refresh: token.refreshToken }),
