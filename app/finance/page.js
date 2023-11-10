@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -11,7 +10,8 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Chip from "@mui/material/Chip";
 import { fetchTransactions, fetchTransactionTypes } from "@/services/services";
-import { useApi } from "@/app/api/api";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { useSession } from "next-auth/react";
 
 export default function Transactions() {
   const [filters, setFilters] = useState({
@@ -22,8 +22,8 @@ export default function Transactions() {
   });
   const [transactions, setTransactions] = useState([]);
   const [transactionTypes, setTransactionTypes] = useState([]);
-  const { data: session } = useSession();
-  const api = useApi();
+  const api = useAuthenticatedApi();
+  const { data: session, status } = useSession();
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -45,21 +45,23 @@ export default function Transactions() {
   const accounts = ["1", "2", "3", "4", "5", "6"];
 
   useEffect(() => {
-    const getTransactionTypes = async () => {
-      try {
-        const types = await api.get(
-          "/api/v1/transaction/unique_transaction_types/"
-        );
-        console.log(types);
-        console.log(types.data);
-        setTransactionTypes(Object.entries(types.data));
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    console.log(status)
+    if (status !== "loading") {
+      const getTransactionTypes = async () => {
+        try {
+          const types = await api.get(
+            "/api/v1/transaction/unique_transaction_types/"
+          );
+          console.log(types)
+          setTransactionTypes(Object.entries(types.data));
+        } catch (error) {
+          console.error(error);
+        }
+      };
 
-    getTransactionTypes();
-  }, []);
+      getTransactionTypes();
+    }
+  }, [status]);
 
   return (
     <div>
@@ -101,6 +103,7 @@ export default function Transactions() {
             multiple
             value={filters.account}
             name="account"
+            label="Account"
             onChange={handleFilterChange}
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -121,9 +124,11 @@ export default function Transactions() {
           <InputLabel id="type-transaction-label">Transaction Type</InputLabel>
           <Select
             labelId="type-transaction-label"
+            id="type-transaction"
             multiple
             value={filters.type_transaction}
             name="type_transaction"
+            label="Transaction Type"
             onChange={handleFilterChange}
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>

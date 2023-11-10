@@ -1,5 +1,3 @@
-import { options } from "@/app/api/auth/[...nextauth]/options";
-import { api } from "@/app/api/api"; 
 
 export const fetchTransactions = async ({
   time_transaction_after = "",
@@ -38,17 +36,3 @@ export async function getPositions(session) {
   }
   return response.json();
 }
-
-
-export const fetchTransactionTypes = async (session) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}/api/v1/transaction/unique_transaction_types/`, {
-    headers: {
-      'Authorization': `Bearer ${session.user.accessToken}`
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json();
-};

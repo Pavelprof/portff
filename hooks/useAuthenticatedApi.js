@@ -1,9 +1,9 @@
 'use client'
 
-import { useSession } from 'next-auth/react';
+import { useSession, signIn  } from 'next-auth/react';
 import axios from 'axios';
 
-export const useApi = () => {
+export const useAuthenticatedApi = () => {
   const { data: session } = useSession();
 
   const api = axios.create({
@@ -19,12 +19,13 @@ export const useApi = () => {
 
   api.interceptors.response.use(
     (response) => {
-      // Обработка успешного ответа
       return response;
     },
     (error) => {
-      // Обработка ошибок в ответе
-      if (!error.response) {
+      console.log(session)
+      if (error.response && error.response.status === 401) {
+        signIn();
+      } else if (!error.response) {
         throw new Error('Network response was not ok');
       }
       return Promise.reject(error);
