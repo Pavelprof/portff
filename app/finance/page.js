@@ -34,29 +34,27 @@ export default function Transactions() {
   };
 
   const handleFetchTransactions = async () => {
-    try {
-      const fetchedTransactions = await fetchTransactions(filters);
-      setTransactions(fetchedTransactions);
-    } catch (error) {
-      console.error("There was an error fetching the transactions: ", error);
-    }
+    const params = new URLSearchParams();
+
+    if (filters.time_transaction_after) params.append('time_transaction_after', filters.time_transaction_after);
+    if (filters.time_transaction_before) params.append('time_transaction_before', filters.time_transaction_before);
+    filters.account.forEach(a => params.append('account', a));
+    filters.type_transaction.forEach(t => params.append('type_transaction', t));
+  
+    const fetchedTransactions = await api.get(`/api/v1/transaction/?${params.toString()}`);
+    setTransactions(fetchedTransactions.data);
   };
 
   const accounts = ["1", "2", "3", "4", "5", "6"];
 
   useEffect(() => {
-    console.log(status)
+    console.log(status);
     if (status !== "loading") {
       const getTransactionTypes = async () => {
-        try {
-          const types = await api.get(
-            "/api/v1/transaction/unique_transaction_types/"
-          );
-          console.log(types)
-          setTransactionTypes(Object.entries(types.data));
-        } catch (error) {
-          console.error(error);
-        }
+        const types = await api.get(
+          "/api/v1/transaction/unique_transaction_types/"
+        );
+        setTransactionTypes(Object.entries(types.data));
       };
 
       getTransactionTypes();
