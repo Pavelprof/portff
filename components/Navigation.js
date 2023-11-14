@@ -52,12 +52,7 @@ const Navigation = () => {
           </ListItem>
           <ListItem>
             <Link href="/position" passHref>
-              <Button color="inherit">Positions</Button>
-            </Link>
-          </ListItem>
-          <ListItem>
-            <Link href="/structure" passHref>
-              <Button color="inherit">Portfolio Structure</Button>
+              <Button color="inherit">Positions & Structure</Button>
             </Link>
           </ListItem>
           <ListItem>
