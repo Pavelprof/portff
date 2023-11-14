@@ -42,7 +42,7 @@ export default function Positions() {
     if (filters.ticker) params.append('ticker', filters.ticker);
     if (filters.isin) params.append('isin', filters.isin);
     if (filters.currency_influence) params.append('currency_influence', filters.currency_influence);
-    filters.type_transaction.forEach(t => params.append('type_transaction', t));
+    filters.type_asset.forEach(t => params.append('type_asset', t));
     filters.account.forEach(a => params.append('account', a));
   
     const fetchedPositions = await api.get(`/api/v1/position/?${params.toString()}`);
@@ -114,15 +114,56 @@ export default function Positions() {
           onChange={handleFilterChange}
         />
         <TextField
-          name="time_transaction_before"
-          label="Before Date"
-          type="datetime-local"
-          value={filters.time_transaction_before}
+          name="isin"
+          label="Isin"
+          type="text"
+          value={filters.isin}
           InputLabelProps={{
             shrink: true,
           }}
           onChange={handleFilterChange}
         />
+        <TextField
+          name="currency_influence"
+          label="Currency influence"
+          type="text"
+          value={filters.currency_influence}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleFilterChange}
+        />
+        <FormControl sx={{ m: 1, width: "25ch" }}>
+          <InputLabel id="type-asset-label">Asset type</InputLabel>
+          <Select
+            labelId="type-asset-label"
+            id="type-asset"
+            multiple
+            value={filters.type_asset}
+            name="type_asset"
+            label="Asset type"
+            onChange={handleFilterChange}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip
+                    key={value}
+                    label={
+                      assetTypes.find((type) => type[1] === value)?.[0] ||
+                      value
+                    }
+                  />
+                ))}
+              </Box>
+            )}
+          >
+            {assetTypes.map((type) => (
+              <MenuItem key={type[1]} value={type[1]}>
+                {type[0]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <FormControl sx={{ m: 1, width: "25ch" }}>
           <InputLabel id="account-label">Account</InputLabel>
           <Select
@@ -147,39 +188,8 @@ export default function Positions() {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }}>
-          <InputLabel id="type-asset-label">Transaction Type</InputLabel>
-          <Select
-            labelId="type-asset-label"
-            id="type-asset"
-            multiple
-            value={filters.type_asset}
-            name="type_asset"
-            label="Asset Type"
-            onChange={handleFilterChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={
-                      assetTypes.find((type) => type[1] === value)?.[0] ||
-                      value
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-          >
-            {assetTypes.map((type) => (
-              <MenuItem key={type[1]} value={type[1]}>
-                {type[0]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
         <Button variant="contained" onClick={handleFetchPositions}>
-          Fetch Transactions
+          Apply
         </Button>
       </Box>
       <ul>

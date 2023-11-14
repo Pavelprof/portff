@@ -9,7 +9,6 @@ const PositionsLayout = ({ children }) => {
   return (
     <div>
       <h2>Positions</h2>
-      <h2>Here is your positions</h2>
       {children}
     </div>
   );
