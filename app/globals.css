@@ -2,41 +2,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #444;
 }
 
-/* Стили для ссылок */
-a {
-  color: #0077cc;
-}
-
-/* Страницы ошибок */
-.error-page {
-  text-align: center;
-  font-size: 2rem;
-  color: #FF5733;
-}
-
-/* Боковая панель */
-.sidebar {
-  width: 250px;
-  color: white;
-  padding: 15px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-}
-
-/* Футер */
-.footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-
 /* Контейнер для основного содержимого */
 .container {
   margin: 64px auto 0 auto; /* top, right, bottom, left */
@@ -52,18 +17,6 @@ header {
   text-align: center;
 }
 
-header a {
-  text-decoration: none;
-  color: white;
-  margin: 0 15px;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-header a:hover {
-  background-color: #444;
-}
-
 /* Стили для footer */
 footer {
   background-color: #444;
@@ -73,30 +26,4 @@ footer {
   position: relative;
   bottom: 0;
   width: 100%;
-}
-
-footer p {
-  margin: 0;
-  padding: 0;
-}
-
-/* Дополнительные стили для ссылок в footer, если они есть */
-footer a {
-  color: white;
-  text-decoration: none;
-  margin: 0 5px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-h1 {
-  font-size: 2.5em;
-  margin-bottom: 20px;
-  color: #333;
-  text-align: center;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
 }

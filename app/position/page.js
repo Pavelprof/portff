@@ -15,12 +15,12 @@ import { useSession } from "next-auth/react";
 
 export default function Positions() {
   const [filters, setFilters] = useState({
-    settlement_currency: [],
     ticker: "",
     isin: "",
     currency_influence: "",
     type_asset: [],
     account: [],
+    settlement_currency: [],
   });
   const [positions, setPositions] = useState([]);
   const [assetTypes, setAssetTypes] = useState([]);
@@ -38,7 +38,7 @@ export default function Positions() {
   const handleFetchPositions = async () => {
     const params = new URLSearchParams();
 
-    if (filters.settlement_currency) params.append('settlement_currency', filters.settlement_currency);
+    if (filters.settlement_currency.length > 0) params.append('settlement_currency', filters.settlement_currency);
     if (filters.ticker) params.append('ticker', filters.ticker);
     if (filters.isin) params.append('isin', filters.isin);
     if (filters.currency_influence) params.append('currency_influence', filters.currency_influence);
@@ -72,9 +72,6 @@ export default function Positions() {
         component="form"
         sx={{
           "& .MuiTextField-root": { m: 1, width: "25ch" },
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "start",
         }}
         noValidate
         autoComplete="off"
@@ -188,10 +185,10 @@ export default function Positions() {
             ))}
           </Select>
         </FormControl>
+      </Box>
         <Button variant="contained" onClick={handleFetchPositions}>
           Apply
         </Button>
-      </Box>
       <ul>
          {positions.map(position => (
         <li key={position.id}>

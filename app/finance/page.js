@@ -67,9 +67,6 @@ export default function Transactions() {
         component="form"
         sx={{
           "& .MuiTextField-root": { m: 1, width: "25ch" },
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "start",
         }}
         noValidate
         autoComplete="off"
