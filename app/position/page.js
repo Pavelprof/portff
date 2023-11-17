@@ -15,12 +15,12 @@ import { useSession } from "next-auth/react";
 
 export default function Positions() {
   const [filters, setFilters] = useState({
+    settlement_currency: "",
     ticker: "",
     isin: "",
-    currency_influence: "",
+    currency_influence: [],
     type_asset: [],
     account: [],
-    settlement_currency: [],
   });
   const [positions, setPositions] = useState([]);
   const [assetTypes, setAssetTypes] = useState([]);
@@ -41,7 +41,7 @@ export default function Positions() {
     if (filters.settlement_currency.length > 0) params.append('settlement_currency', filters.settlement_currency);
     if (filters.ticker) params.append('ticker', filters.ticker);
     if (filters.isin) params.append('isin', filters.isin);
-    if (filters.currency_influence) params.append('currency_influence', filters.currency_influence);
+    filters.currency_influence.forEach(t => params.append('currency_influence', t));
     filters.type_asset.forEach(t => params.append('type_asset', t));
     filters.account.forEach(a => params.append('account', a));
   
@@ -50,7 +50,9 @@ export default function Positions() {
   };
 
   const accounts = ["1", "2", "3", "4", "5", "6"];
-  const settlement_currencies = ["USD", "EUR", "RUB", "BTC"];
+  const settlementCurrencies = ["USD", "EUR", "RUB", "BTC"];
+  const currencyInfluence = [['USD', '2'],['EUR', '3'],['RUB', '1']];
+  console.log(currencyInfluence)
 
   useEffect(() => {
     console.log(status);
@@ -59,6 +61,8 @@ export default function Positions() {
         const types = await api.get(
           "/api/v1/position/unique_asset_types/"
         );
+        console.log(types.data)
+        console.log(Object.entries(types.data))
         setAssetTypes(Object.entries(types.data));
       };
 
@@ -80,20 +84,12 @@ export default function Positions() {
           <InputLabel id="settlement-currency-label">Settlement currency</InputLabel>
           <Select
             labelId="settlement-currency-label"
-            multiple
             value={filters.settlement_currency}
-            name="settlement currency"
+            name="settlement_currency"
             label="Settlement currency"
             onChange={handleFilterChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
-            )}
           >
-            {settlement_currencies.map((settlement_currency) => (
+            {settlementCurrencies.map((settlement_currency) => (
               <MenuItem key={settlement_currency} value={settlement_currency}>
                 {settlement_currency}
               </MenuItem>
@@ -120,16 +116,37 @@ export default function Positions() {
           }}
           onChange={handleFilterChange}
         />
-        <TextField
-          name="currency_influence"
-          label="Currency influence"
-          type="text"
-          value={filters.currency_influence}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={handleFilterChange}
-        />
+        <FormControl sx={{ m: 1, width: "25ch" }}>
+          <InputLabel id="currency-influence-label">Currency influence</InputLabel>
+          <Select
+            labelId="currency-influence-label"
+            id="currency-influence"
+            multiple
+            value={filters.currency_influence}
+            name="currency_influence"
+            label="Currency influence"
+            onChange={handleFilterChange}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip
+                    key={value}
+                    label={
+                      currencyInfluence.find((currency) => currency[1] === value)?.[0] ||
+                      value
+                    }
+                  />
+                ))}
+              </Box>
+            )}
+          >
+            {currencyInfluence.map((currency) => (
+              <MenuItem key={currency[1]} value={currency[1]}>
+                {currency[0]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <FormControl sx={{ m: 1, width: "25ch" }}>
           <InputLabel id="type-asset-label">Asset type</InputLabel>
           <Select
