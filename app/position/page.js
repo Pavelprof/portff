@@ -1,26 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Chip from "@mui/material/Chip";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
-import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
+import { PositionFilters } from "@/components/PositionFilters";
+import { PositionList } from "@/components/PositionList";
+import { AssetPieChart } from "@/components/AssetPieChart";
+import { preparePieChartData } from "@/services/services";
 
 export default function Positions() {
   const [filters, setFilters] = useState({
@@ -35,6 +22,7 @@ export default function Positions() {
   const [assetTypes, setAssetTypes] = useState([]);
   const api = useAuthenticatedApi();
   const { data: session, status } = useSession();
+  const [viewMode, setViewMode] = useState("list");
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -63,6 +51,12 @@ export default function Positions() {
     setPositions(fetchedPositions.data);
   };
 
+  const handleViewChange = (event, newView) => {
+    if (newView) {
+      setViewMode(newView);
+    }
+  };
+
   const accounts = ["1", "2", "3", "4", "5", "6"];
   const settlementCurrencies = ["USD", "EUR", "RUB", "BTC"];
   const currencyInfluence = [
@@ -70,15 +64,12 @@ export default function Positions() {
     ["EUR", "3"],
     ["RUB", "1"],
   ];
-  console.log(currencyInfluence);
+  const pieChartData = preparePieChartData(positions);
 
   useEffect(() => {
-    console.log(status);
     if (status !== "loading") {
       const getPositionAssetTypes = async () => {
         const types = await api.get("/api/v1/position/unique_asset_types/");
-        console.log(types.data);
-        console.log(Object.entries(types.data));
         setAssetTypes(Object.entries(types.data));
       };
 
@@ -88,185 +79,43 @@ export default function Positions() {
 
   return (
     <div>
-      <Box
-        component="form"
-        sx={{
-          "& .MuiTextField-root": { m: 1, width: "25ch" },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        <FormControl sx={{ m: 1, width: "25ch" }}>
-          <InputLabel id="settlement-currency-label">
-            Settlement currency
-          </InputLabel>
-          <Select
-            labelId="settlement-currency-label"
-            value={filters.settlement_currency}
-            name="settlement_currency"
-            label="Settlement currency"
-            onChange={handleFilterChange}
-          >
-            {settlementCurrencies.map((settlement_currency) => (
-              <MenuItem key={settlement_currency} value={settlement_currency}>
-                {settlement_currency}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          name="ticker"
-          label="Ticker"
-          type="text"
-          value={filters.ticker}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={handleFilterChange}
-        />
-        <TextField
-          name="isin"
-          label="Isin"
-          type="text"
-          value={filters.isin}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={handleFilterChange}
-        />
-        <FormControl sx={{ m: 1, width: "25ch" }}>
-          <InputLabel id="currency-influence-label">
-            Currency influence
-          </InputLabel>
-          <Select
-            labelId="currency-influence-label"
-            id="currency-influence"
-            multiple
-            value={filters.currency_influence}
-            name="currency_influence"
-            label="Currency influence"
-            onChange={handleFilterChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={
-                      currencyInfluence.find(
-                        (currency) => currency[1] === value
-                      )?.[0] || value
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-          >
-            {currencyInfluence.map((currency) => (
-              <MenuItem key={currency[1]} value={currency[1]}>
-                {currency[0]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }}>
-          <InputLabel id="type-asset-label">Asset type</InputLabel>
-          <Select
-            labelId="type-asset-label"
-            id="type-asset"
-            multiple
-            value={filters.type_asset}
-            name="type_asset"
-            label="Asset type"
-            onChange={handleFilterChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={
-                      assetTypes.find((type) => type[1] === value)?.[0] || value
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-          >
-            {assetTypes.map((type) => (
-              <MenuItem key={type[1]} value={type[1]}>
-                {type[0]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ m: 1, width: "25ch" }}>
-          <InputLabel id="account-label">Account</InputLabel>
-          <Select
-            labelId="account-label"
-            multiple
-            value={filters.account}
-            name="account"
-            label="Account"
-            onChange={handleFilterChange}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
-                ))}
-              </Box>
-            )}
-          >
-            {accounts.map((account) => (
-              <MenuItem key={account} value={account}>
-                {account}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Button variant="contained" onClick={handleFetchPositions}>
+      <PositionFilters
+        filters={filters}
+        handleFilterChange={handleFilterChange}
+        settlementCurrencies={settlementCurrencies}
+        currencyInfluence={currencyInfluence}
+        assetTypes={assetTypes}
+        accounts={accounts}
+      />
+
+      <Button
+        variant="contained"
+        sx={{ margin: 2 }}
+        onClick={handleFetchPositions}>
         Apply
       </Button>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell align="right">Ticker</TableCell>
-              <TableCell align="right">Account</TableCell>
-              <TableCell align="right">Quantity</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Currency</TableCell>
-              <TableCell align="right">Total Value</TableCell>
-              <TableCell align="right">Total Value currency</TableCell>
-              <TableCell align="right">ISIN</TableCell>
-              <TableCell align="right">Asset Name</TableCell>
-              <TableCell align="right">Asset Type</TableCell>
-              <TableCell align="right">Currency Influence</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {positions.map((position, index) => (
-              <TableRow
-                key={position.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">{index + 1}</TableCell>
-                <TableCell align="right">{position.asset.ticker}</TableCell>
-                <TableCell align="right">{position.account}</TableCell>
-                <TableCell align="right">{position.quantity_position}</TableCell>
-                <TableCell align="right">{position.asset.price}</TableCell>
-                <TableCell align="right">{position.asset.currency}</TableCell>
-                <TableCell align="right">{position.total_value}</TableCell>
-                <TableCell align="right">{position.total_value_currency}</TableCell>
-                <TableCell align="right">{position.asset.isin}</TableCell>
-                <TableCell align="right">{position.asset.name_asset}</TableCell>
-                <TableCell align="right">{position.asset.type_asset_display}</TableCell>
-                <TableCell align="right">{position.asset.currency_influence}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      <Box sx={{ width: "100%", textAlign: "left", margin: 2 }}>
+        <ToggleButtonGroup
+          value={viewMode}
+          exclusive
+          onChange={handleViewChange}
+          aria-label="View mode"
+        >
+          <ToggleButton value="list" aria-label="list view">
+            List View
+          </ToggleButton>
+          <ToggleButton value="chart" aria-label="chart view">
+            Chart View
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+
+      {viewMode === 'list' ? (
+        <PositionList positions={positions} />
+      ) : (
+        <AssetPieChart data={pieChartData} />
+      )}
     </div>
   );
 }

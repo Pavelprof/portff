@@ -1,13 +1,19 @@
+export function preparePieChartData(positions) {
+  const assetTypeAggregation = {};
 
-export async function getPositions(session) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_PORTF_URL}/api/v1/position/?settlement_currency=USD`, {
-    headers: {
-      'Authorization': `Bearer ${session.user.accessToken}`
+  positions.forEach(position => {
+    const type = position.asset.type_asset_display;
+    const value = position.total_value;
+
+    if (assetTypeAggregation[type]) {
+      assetTypeAggregation[type] += value;
+    } else {
+      assetTypeAggregation[type] = value;
     }
   });
-  if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(JSON.stringify(errorData));
-  }
-  return response.json();
+
+  return Object.entries(assetTypeAggregation).map(([name, value]) => ({
+    name,
+    value
+  }));
 }
