@@ -22,7 +22,9 @@ export default function Positions() {
   const [assetTypes, setAssetTypes] = useState([]);
   const api = useAuthenticatedApi();
   const { data: session, status } = useSession();
-  const [viewMode, setViewMode] = useState("list");
+  const [viewMode, setViewMode] = useState("chart");
+  const [positonsTotalValue, setPositonsTotalValue] = useState(0);
+  const [totalValueCurrency, setTotalValueCurrency] = useState("USD");
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -45,10 +47,13 @@ export default function Positions() {
     filters.type_asset.forEach((t) => params.append("type_asset", t));
     filters.account.forEach((a) => params.append("account", a));
 
-    const fetchedPositions = await api.get(
-      `/api/v1/position/?${params.toString()}`
-    );
+    const fetchedPositions = await api.get(`/api/v1/position/?${params.toString()}`);
     setPositions(fetchedPositions.data);
+
+    const totalValue = fetchedPositions.data.reduce((acc, position) => acc + position.total_value, 0);
+    setPositonsTotalValue(totalValue);
+
+    if (filters.settlement_currency) setTotalValueCurrency(filters.settlement_currency);
   };
 
   const handleViewChange = (event, newView) => {
@@ -102,14 +107,15 @@ export default function Positions() {
           onChange={handleViewChange}
           aria-label="View mode"
         >
-          <ToggleButton value="list" aria-label="list view">
-            List View
-          </ToggleButton>
           <ToggleButton value="chart" aria-label="chart view">
             Chart View
           </ToggleButton>
+          <ToggleButton value="list" aria-label="list view">
+            List View
+          </ToggleButton>
         </ToggleButtonGroup>
       </Box>
+      <h3>Positions total value: { positonsTotalValue.toLocaleString('en-EN') + ' ' + totalValueCurrency }</h3>
 
       {viewMode === 'list' ? (
         <PositionList positions={positions} />
