@@ -11,10 +11,11 @@ import {
 export function PositionFilters({
   filters,
   handleFilterChange,
-  settlementCurrencies,
+  currencySettlement,
   currencyInfluence,
   assetTypes,
   accounts,
+  structures,
 }) {
   return (
     <Box
@@ -32,38 +33,19 @@ export function PositionFilters({
         </InputLabel>
         <Select
           labelId="settlement-currency-label"
+          id="settlement-currency"
           value={filters.settlement_currency}
           name="settlement_currency"
           label="Settlement currency"
           onChange={handleFilterChange}
         >
-          {settlementCurrencies.map((settlement_currency) => (
-            <MenuItem key={settlement_currency} value={settlement_currency}>
-              {settlement_currency}
+          {currencySettlement.map((currency) => (
+            <MenuItem key={currency[1]} value={currency[1]}>
+              {currency[0]}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
-      <TextField
-        name="ticker"
-        label="Ticker"
-        type="text"
-        value={filters.ticker}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        onChange={handleFilterChange}
-      />
-      <TextField
-        name="isin"
-        label="Isin"
-        type="text"
-        value={filters.isin}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        onChange={handleFilterChange}
-      />
       <FormControl sx={{ m: 1, width: "25ch" }}>
         <InputLabel id="currency-influence-label">
           Currency influence
@@ -98,6 +80,26 @@ export function PositionFilters({
           ))}
         </Select>
       </FormControl>
+      <TextField
+        name="ticker"
+        label="Ticker"
+        type="text"
+        value={filters.ticker}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        onChange={handleFilterChange}
+      />
+      <TextField
+        name="isin"
+        label="Isin"
+        type="text"
+        value={filters.isin}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        onChange={handleFilterChange}
+      />
       <FormControl sx={{ m: 1, width: "25ch" }}>
         <InputLabel id="type-asset-label">Asset type</InputLabel>
         <Select
@@ -148,6 +150,25 @@ export function PositionFilters({
           {accounts.map((account) => (
             <MenuItem key={account} value={account}>
               {account}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl sx={{ m: 1, width: "25ch" }}>
+        <InputLabel id="structure-label">
+          Structure
+        </InputLabel>
+        <Select
+          labelId="structure-label"
+          id="structure"
+          value={filters.structure}
+          name="structure"
+          label="Structure"
+          onChange={handleFilterChange}
+        >
+          {structures.map((structure) => (
+            <MenuItem key={structure[1]} value={structure[1]}>
+              {structure[0]}
             </MenuItem>
           ))}
         </Select>

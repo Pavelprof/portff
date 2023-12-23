@@ -38,10 +38,10 @@ import {
                 <TableCell align="right">{positions.asset.ticker}</TableCell>
                 <TableCell align="right">{positions.account}</TableCell>
                 <TableCell align="right">{positions.quantity_position}</TableCell>
-                <TableCell align="right">{positions.asset.price.toLocaleString('en-EN')}</TableCell>
-                <TableCell align="right">{positions.asset.currency}</TableCell>
-                <TableCell align="right">{positions.total_value.toLocaleString('en-EN')}</TableCell>
-                <TableCell align="right">{positions.total_value_currency}</TableCell>
+                <TableCell align="right">{positions.price.toLocaleString('en-EN')}</TableCell>
+                <TableCell align="right">{positions.price_currency}</TableCell>
+                <TableCell align="right">{positions.position_value.toLocaleString('en-EN')}</TableCell>
+                <TableCell align="right">{positions.position_value_currency}</TableCell>
                 <TableCell align="right">{positions.asset.isin}</TableCell>
                 <TableCell align="right">{positions.asset.name_asset}</TableCell>
                 <TableCell align="right">{positions.asset.type_asset_display}</TableCell>

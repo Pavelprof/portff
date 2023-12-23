@@ -6,19 +6,22 @@ import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 import { PositionFilters } from "@/components/PositionFilters";
 import { PositionList } from "@/components/PositionList";
+import { UniversalTable } from "@/components/UniversalTable";
 import { AssetPieChart } from "@/components/AssetPieChart";
 import { preparePieChartData } from "@/services/services";
 
 export default function Positions() {
   const [filters, setFilters] = useState({
-    settlement_currency: "",
+    settlement_currency: "2",
     ticker: "",
     isin: "",
+    structure: "1",
     currency_influence: [],
     type_asset: [],
     account: [],
   });
   const [positions, setPositions] = useState([]);
+  const [structureData, setStructureData] = useState(null);
   const [assetTypes, setAssetTypes] = useState([]);
   const api = useAuthenticatedApi();
   const { data: session, status } = useSession();
@@ -37,23 +40,42 @@ export default function Positions() {
   const handleFetchPositions = async () => {
     const params = new URLSearchParams();
 
-    if (filters.settlement_currency.length > 0)
-      params.append("settlement_currency", filters.settlement_currency);
     if (filters.ticker) params.append("ticker", filters.ticker);
     if (filters.isin) params.append("isin", filters.isin);
+    if (filters.settlement_currency)
+      params.append("settlement_currency", filters.settlement_currency);
+    if (filters.structure) params.append("structure", filters.structure);
     filters.currency_influence.forEach((t) =>
       params.append("currency_influence", t)
     );
     filters.type_asset.forEach((t) => params.append("type_asset", t));
     filters.account.forEach((a) => params.append("account", a));
 
-    const fetchedPositions = await api.get(`/api/v1/position/?${params.toString()}`);
-    setPositions(fetchedPositions.data);
+    setTotalValueCurrency(
+      currencySettlement.find(
+        (c) => c[1] === filters.settlement_currency
+      )?.[0] ?? "Unknown"
+    );
 
-    const totalValue = fetchedPositions.data.reduce((acc, position) => acc + position.total_value, 0);
-    setPositonsTotalValue(totalValue);
+    if (viewMode === "list") {
+      const fetchedPositions = await api.get(
+        `/api/v1/position/?${params.toString()}`
+      );
 
-    if (filters.settlement_currency) setTotalValueCurrency(filters.settlement_currency);
+      const totalValue = fetchedPositions.data.reduce(
+        (acc, position) => acc + position.position_value,
+        0
+      );
+      setPositonsTotalValue(totalValue);
+      setPositions(fetchedPositions.data);
+    } else if (viewMode === "chart") {
+      const fetchedStructureData = await api.get(
+        `/api/v1/position/structure/?${params.toString()}`
+      );
+
+      setPositonsTotalValue(fetchedStructureData.data.total_positions.value);
+      setStructureData(fetchedStructureData.data);
+    }
   };
 
   const handleViewChange = (event, newView) => {
@@ -63,13 +85,64 @@ export default function Positions() {
   };
 
   const accounts = ["1", "2", "3", "4", "5", "6"];
-  const settlementCurrencies = ["USD", "EUR", "RUB", "BTC"];
+  const currencySettlement = [
+    ["USD", "2"],
+    ["EUR", "3"],
+    ["RUB", "1"],
+  ];
+  const structures = [
+    ["first", "1"],
+    ["second", "2"],
+    ["third", "3"],
+  ];
   const currencyInfluence = [
     ["USD", "2"],
     ["EUR", "3"],
     ["RUB", "1"],
   ];
-  const pieChartData = preparePieChartData(positions);
+
+  const targetWeightPieChartData = structureData
+    ? structureData.groups.map((group) => ({
+        name: group.group_name,
+        value: group.target_weight,
+      }))
+    : [];
+
+  const weightPieChartData = structureData
+    ? structureData.groups.map((group) => ({
+        name: group.group_name,
+        value: group.weight,
+      }))
+    : [];
+
+  const overlappingPositions = structureData
+    ? structureData.overlapping_positions.map((pos) => ({
+        Exchange: pos.exchange.name,
+        Asset: pos.asset.ticker,
+        "Asset price": pos.asset.asset_price,
+        "Asset price currency": pos.asset.asset_price_currency,
+        "Position quantity": pos.quantity_position,
+        "Position value": pos.position_value,
+        "Position value currency": pos.position_value_currency,
+        Groups: pos.groups.map((group) => group.group_name).join(", "),
+      }))
+    : [];
+
+  const positionsList = positions.map((position) => ({
+    Ticker: position.asset.ticker,
+    Account: position.account,
+    Quantity: position.quantity_position,
+    Price: position.price,
+    Currency: position.price_currency,
+    "Total Value": position.position_value,
+    "Total Value currency": position.position_value_currency,
+    ISIN: position.asset.isin,
+    "Asset Name": position.asset.name_asset
+      ? position.asset.name_asset
+      : position.asset.full_name_asset,
+    "Asset Type": position.asset.type_asset_display,
+    "Currency Influence": position.asset.currency_influence,
+  }));
 
   useEffect(() => {
     if (status !== "loading") {
@@ -87,16 +160,18 @@ export default function Positions() {
       <PositionFilters
         filters={filters}
         handleFilterChange={handleFilterChange}
-        settlementCurrencies={settlementCurrencies}
+        currencySettlement={currencySettlement}
         currencyInfluence={currencyInfluence}
         assetTypes={assetTypes}
         accounts={accounts}
+        structures={structures}
       />
 
       <Button
         variant="contained"
         sx={{ margin: 2 }}
-        onClick={handleFetchPositions}>
+        onClick={handleFetchPositions}
+      >
         Apply
       </Button>
 
@@ -115,12 +190,34 @@ export default function Positions() {
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
-      <h3>Positions total value: { positonsTotalValue.toLocaleString('en-EN') + ' ' + totalValueCurrency }</h3>
+      <h3>
+        Positions total value:{" "}
+        {positonsTotalValue.toLocaleString("en-EN") + " " + totalValueCurrency}
+      </h3>
 
-      {viewMode === 'list' ? (
-        <PositionList positions={positions} />
+      {viewMode === "list" ? (
+        <UniversalTable data={positionsList} />
       ) : (
-        <AssetPieChart data={pieChartData} />
+        <>
+          {weightPieChartData.length > 0 && (
+            <>
+              <h2>Current weight</h2>
+              <AssetPieChart data={weightPieChartData} />
+            </>
+          )}
+          {targetWeightPieChartData.length > 0 && (
+            <>
+              <h2>Target weight</h2>
+              <AssetPieChart data={targetWeightPieChartData} />
+            </>
+          )}
+          {overlappingPositions.length > 0 && (
+            <>
+              <h2>Overlapping positions</h2>
+              <UniversalTable data={overlappingPositions} />
+            </>
+          )}
+        </>
       )}
     </div>
   );
