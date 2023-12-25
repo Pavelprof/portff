@@ -23,6 +23,7 @@ export default function Positions() {
   const [positions, setPositions] = useState([]);
   const [structureData, setStructureData] = useState(null);
   const [assetTypes, setAssetTypes] = useState([]);
+  const [structures, setStructures] = useState([]);
   const api = useAuthenticatedApi();
   const { data: session, status } = useSession();
   const [viewMode, setViewMode] = useState("chart");
@@ -90,11 +91,11 @@ export default function Positions() {
     ["EUR", "3"],
     ["RUB", "1"],
   ];
-  const structures = [
-    ["first", "1"],
-    ["second", "2"],
-    ["third", "3"],
-  ];
+  // const structures = [
+  //   ["first", "1"],
+  //   ["second", "2"],
+  //   ["third", "3"],
+  // ];
   const currencyInfluence = [
     ["USD", "2"],
     ["EUR", "3"],
@@ -151,7 +152,18 @@ export default function Positions() {
         setAssetTypes(Object.entries(types.data));
       };
 
+      const getStructures = async () => {
+        try {
+          const response = await api.get("/api/v1/structure/");
+          const formattedStructures = response.data.map(structure => [structure.name, structure.id.toString()]);
+          setStructures(formattedStructures);
+        } catch (error) {
+          console.error("Ошибка при получении структур:", error);
+        }
+      };
+
       getPositionAssetTypes();
+      getStructures();
     }
   }, [status]);
 
