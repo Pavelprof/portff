@@ -16,7 +16,7 @@ export default function ErrorWrapper(errorData) {
     }
 
     useEffect(() => {
-        console.log('Test')
+        console.log('Tesst')
     })
 
     return (
