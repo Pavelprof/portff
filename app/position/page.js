@@ -5,10 +5,8 @@ import { useSession } from "next-auth/react";
 import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useAuthenticatedApi } from "@/hooks/useAuthenticatedApi";
 import { PositionFilters } from "@/components/PositionFilters";
-import { PositionList } from "@/components/PositionList";
 import { UniversalTable } from "@/components/UniversalTable";
 import { AssetPieChart } from "@/components/AssetPieChart";
-import { preparePieChartData } from "@/services/services";
 
 export default function Positions() {
   const [filters, setFilters] = useState({
@@ -91,11 +89,6 @@ export default function Positions() {
     ["EUR", "3"],
     ["RUB", "1"],
   ];
-  // const structures = [
-  //   ["first", "1"],
-  //   ["second", "2"],
-  //   ["third", "3"],
-  // ];
   const currencyInfluence = [
     ["USD", "2"],
     ["EUR", "3"],
@@ -112,7 +105,7 @@ export default function Positions() {
   const weightPieChartData = structureData
     ? structureData.groups.map((group) => ({
         name: group.group_name,
-        value: group.weight,
+        value: group.group_value,
       }))
     : [];
 
