@@ -148,7 +148,7 @@ export default function Positions() {
       const getStructures = async () => {
         try {
           const response = await api.get("/api/v1/structure/");
-          const formattedStructures = response.data.map(structure => [structure.name, structure.id.toString()]);
+          const formattedStructures = response.data.results.map(structure => [structure.name, structure.id.toString()]);
           setStructures(formattedStructures);
         } catch (error) {
           console.error("Ошибка при получении структур:", error);
